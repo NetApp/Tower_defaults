@@ -26,7 +26,7 @@
     when: 
     - aggr_name is not defined
     - "{{ netapp_info.ontap_info.aggregate_info[item].aggr_space_attributes.size_available | int / 1024 / 1024 / 1024 }}  > {{ size }}"
-  - na_ontap_volume.yml
+  - na_ontap_volume:
       state: "{{ state }}"
       name: "{{ volume_name }}"
       aggregate_name: "{{ aggregate_name }}"
