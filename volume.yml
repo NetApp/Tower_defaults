@@ -37,4 +37,6 @@
       comment: "{{ comment }}"
       hostname: "{{ netapp_hostname }}"
       username: "{{ netapp_username }}"
-      password: "{{ netapp_password }}"    
+      password: "{{ netapp_password }}"
+      https: "{{ https }}"
+      validate_certs: "{{ validate_certs }}"
