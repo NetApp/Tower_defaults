@@ -6,6 +6,10 @@
   - netapp.ontap
   vars:
     state: present
+    comment: 
+    space_guarantee: none
+    https: true
+    validate_certs: false
   tasks:
   - name: Gather aggregate facts
     na_ontap_info:
@@ -29,7 +33,7 @@
   - na_ontap_volume:
       state: "{{ state }}"
       name: "{{ volume_name }}"
-      aggregate_name: "{{ aggregate_name }}"
+      aggregate_name: "{{ aggr_name }}"
       size: "{{ size }}"
       size_unit: gb
       space_guarantee: "{{ space_guarantee }}"
