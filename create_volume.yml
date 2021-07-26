@@ -1,0 +1,48 @@
+--
+- hosts: localhost
+  name: "{{ tower_job_template_name }}"
+  gather_facts: false
+  collections:
+  - netapp.ontap
+  vars:
+    login: &login
+      hostname: "{{ netapp_hostname }}"
+      username: "{{ netapp_username }}"
+      password: "{{ netapp_password }}"
+      https: "{{ https }}"
+      validate_certs: "{{ validate_certs }}"
+    state: present
+    comment: 
+    space_guarantee: none
+    https: true
+    validate_certs: false
+  tasks:
+  - name: Gather aggregate facts
+    na_ontap_info:
+      gather_subset: aggregate_info
+      hostname: "{{ netapp_hostname }}"
+      query:
+        aggr-attributes:
+          aggr-raid-attributes:
+            is-root-aggregate: "false"
+      username: "{{ netapp_username }}"
+      password: "{{ netapp_password }}"
+      https: "{{ https }}"
+      validate_certs: "{{ validate_certs }}"
+    register: netapp_info
+  - set_fact:
+      aggr_name: "{{ item }}"
+    with_items: "{{ netapp_info.ontap_info.aggregate_info }}"
+    when: 
+    - aggr_name is not defined
+    - "{{ netapp_info.ontap_info.aggregate_info[item].aggr_space_attributes.size_available | int / 1024 / 1024 / 1024 }}  > {{ size }}"
+  - na_ontap_volume:
+      state: "{{ state }}"
+      name: "{{ volume_name }}"
+      aggregate_name: "{{ aggr_name }}"
+      size: "{{ size }}"
+      size_unit: gb
+      space_guarantee: "{{ space_guarantee }}"
+      vserver: "{{ vserver }}"
+      comment: "{{ comment }}"
+      <<: *login
