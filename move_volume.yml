@@ -1,4 +1,4 @@
---
+---
 - hosts: localhost
   name: "{{ tower_job_template_name }}"
   gather_facts: false
@@ -29,7 +29,7 @@
       validate_certs: "{{ validate_certs }}"
     register: netapp_info
   - set_fact:
-      size: "{{ netapp_info.ontap_info.volume_info[item].volume_attributes.volume_space_attributes.size }}"
+      size: "{{ netapp_info.ontap_info.volume_info[item].volume_space_attributes.size | int / 1024 / 1024 / 1024 }}"
     with_items: "{{ netapp_info.ontap_info.volume_info }}"
   - name: Gather aggregate facts
     na_ontap_info:
