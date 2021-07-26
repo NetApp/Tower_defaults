@@ -15,6 +15,22 @@
     https: true
     validate_certs: false
   tasks:
+  - name: Gather volume facts
+    na_ontap_info:
+      gather_subset: volume_info
+      hostname: "{{ netapp_hostname }}"
+      query:
+        volume-attributes:
+          volume-id-attributes:
+            name: "{{ volume_name }}"
+      username: "{{ netapp_username }}"
+      password: "{{ netapp_password }}"
+      https: "{{ https }}"
+      validate_certs: "{{ validate_certs }}"
+    register: netapp_info
+  - set_fact:
+      size: "{{ netapp_info.ontap_info.volume_info[item].volume_attributes.volume_space_attributes.size }}"
+    with_items: "{{ netapp_info.ontap_info.volume_info }}"
   - name: Gather aggregate facts
     na_ontap_info:
       gather_subset: aggregate_info
