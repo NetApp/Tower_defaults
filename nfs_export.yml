@@ -1,11 +1,21 @@
----
+--
 - hosts: localhost
   name: "{{ tower_job_template_name }}"
   gather_facts: false
   collections:
   - netapp.ontap
   vars:
+    login: &login
+      hostname: "{{ netapp_hostname }}"
+      username: "{{ netapp_username }}"
+      password: "{{ netapp_password }}"
+      https: "{{ https }}"
+      validate_certs: "{{ validate_certs }}"
     state: present
+    client_match: 
+    ro_rule: any
+    rw_rule: none
+    su_rule: none
     comment: 
     space_guarantee: none
     https: true
@@ -30,6 +40,20 @@
     when: 
     - aggr_name is not defined
     - "{{ netapp_info.ontap_info.aggregate_info[item].aggr_space_attributes.size_available | int / 1024 / 1024 / 1024 }}  > {{ size }}"
+  - na_ontap_export_policy:
+      state: "{{ state }}"
+      name: "{{ volume_name }}_policy"
+      vserver: "{{ vserver }}"
+      <<: *login
+  - na_ontap_epxort_policy_rule:
+      state: "{{ state }}"
+      name: "{{ volume_name }}_policy"
+      client_match: "{{ client_match }}"
+      vserver: "{{ vserver }}"
+      ro_rule: "{{ ro_rule }}"
+      rw_rule: "{{ rw_rule }}"
+      su_rule: "{{ su_rule }}"
+      <<: *login
   - na_ontap_volume:
       state: "{{ state }}"
       name: "{{ volume_name }}"
@@ -39,8 +63,6 @@
       space_guarantee: "{{ space_guarantee }}"
       vserver: "{{ vserver }}"
       comment: "{{ comment }}"
-      hostname: "{{ netapp_hostname }}"
-      username: "{{ netapp_username }}"
-      password: "{{ netapp_password }}"
-      https: "{{ https }}"
-      validate_certs: "{{ validate_certs }}"
+      junction_path: "/{{ volume_name }}"
+      policy: "{{ volume_name }}_policy"
+      <<: *login
