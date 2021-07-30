@@ -1,4 +1,4 @@
---
+---
 - hosts: localhost
   name: "{{ tower_job_template_name }}"
   gather_facts: false
@@ -56,9 +56,9 @@
       <<: *login
   - na_ontap_cifs:
       state: "{{ state }}"
-      share_name: "{{ share_name }}"
+      share_name: "{{ volume_name }}"
       path: "/{{ volume_name }}"
       vserver: "{{ vserver }}"
       share_properties: browsable,oplocks
       symlink_properties: enable
-      comment: "{{ comment }}"
+      comment: "{{ cifs_comment }}"
