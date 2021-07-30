@@ -1,4 +1,4 @@
---
+---
 - hosts: localhost
   name: "{{ tower_job_template_name }}"
   gather_facts: false
