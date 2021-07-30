@@ -62,3 +62,4 @@
       share_properties: browsable,oplocks
       symlink_properties: enable
       comment: "{{ cifs_comment }}"
+      <<: *login
