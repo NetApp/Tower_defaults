@@ -1,0 +1,26 @@
+---
+- hosts: localhost
+  name: "{{ tower_job_template_name }}"
+  gather_facts: false
+  collections:
+  - netapp.ontap
+  vars:
+    login: &login
+      hostname: "{{ netapp_hostname }}"
+      username: "{{ netapp_username }}"
+      password: "{{ netapp_password }}"
+      https: "{{ https }}"
+      validate_certs: "{{ validate_certs }}"
+    state: present
+    https: true
+    validate_certs: false
+  tasks:
+  - name: Create cluster peer
+    na_ontap_cluster_peer:
+      state: "{{ state }}"
+      source_intercluster_lifs: "{{ src_int_lifs }}"
+      dest_intercluster_lifs: "{{ dest_int_lifs }}"
+      passphrase: Netapp123!
+      <<: *login
+      dest_hostname: "{{ dest_netapp_hostname }}"
+      encryption_protocol_proposed: tls_psk
