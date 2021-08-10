@@ -1,0 +1,49 @@
+---
+- hosts: localhost
+  name: "{{ tower_job_template_name }}"
+  gather_facts: false
+  collections:
+  - netapp.ontap
+  vars:
+    login: &login
+      hostname: "{{ netapp_hostname }}"
+      username: "{{ netapp_username }}"
+      password: "{{ netapp_password }}"
+      https: "{{ https }}"
+      validate_certs: "{{ validate_certs }}"
+    state: absent
+    dest_volume: "{{ src_volume }}_dest"
+    https: true
+    validate_certs: false
+  tasks:
+  - name: Get Source Cluster name
+    na_ontap_info:
+      gather_subset: cluster_identity_info
+      <<: *login
+    register: netapp_info
+  - name: Store Source Cluster name
+    set_fact:
+      src_cluster: "{{ netapp_info.ontap_info.cluster_identity_info[item].cluster_name }}"
+    loop: "{{ netapp_info.ontap_info.cluster_identity_info|list }}"
+  - name: Get Destination Cluster name
+    na_ontap_info:
+      gather_subset: cluster_identity_info
+      <<: *login
+      hostname: "{{ dest_netapp_hostname }}"
+    register: netapp_info
+  - name: Store Destination Cluster name
+    set_fact:
+      dest_cluster: "{{ netapp_info.ontap_info.cluster_identity_info[item].cluster_name }}"
+    loop: "{{ netapp_info.ontap_info.cluster_identity_info|list }}"
+  - name: Delete snapmirror
+    na_ontap_snapmirror:
+      state: "{{ state }}"
+      source_endpoint:
+        cluster: "{{ src_cluster }}"
+        path: "{{ src_vserver + ':' + src_volume }}"
+      destination_endpoint:
+        cluster: "{{ dest_cluster }}"
+        path: "{{ dest_vserver + ':' + dest_volume }}"
+      source_hostname: "{{ netapp_hostname }}"
+      <<: *login
+      hostname: "{{ dest_netapp_hostname }}"
