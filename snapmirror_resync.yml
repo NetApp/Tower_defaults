@@ -35,7 +35,7 @@
     set_fact:
       dest_cluster: "{{ netapp_info.ontap_info.cluster_identity_info[item].cluster_name }}"
     loop: "{{ netapp_info.ontap_info.cluster_identity_info|list }}"
-  - name: Break snapmirror
+  - name: Resync snapmirror
     na_ontap_snapmirror:
       state: "{{ state }}"
       relationship_state: active
