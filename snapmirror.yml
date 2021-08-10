@@ -40,7 +40,7 @@
       state: "{{ state }}"
       source_endpoint:
         cluster: "{{ src_cluster }}"
-        path: "{{ src_vserver + ':' + src_volume }}"
+        path: "{{ local_vserver + ':' + local_volume }}"
       destination_endpoint:
         cluster: "{{ dest_cluster }}"
         path: "{{ dest_vserver + ':' + dest_volume }}"
