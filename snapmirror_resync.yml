@@ -35,13 +35,16 @@
     set_fact:
       dest_cluster: "{{ netapp_info.ontap_info.cluster_identity_info[item].cluster_name }}"
     loop: "{{ netapp_info.ontap_info.cluster_identity_info|list }}"
-  - name: Create snapmirror
+  - name: Break snapmirror
     na_ontap_snapmirror:
       state: "{{ state }}"
+      relationship_state: active
       source_endpoint:
         cluster: "{{ src_cluster }}"
         path: "{{ src_vserver + ':' + src_volume }}"
       destination_endpoint:
         cluster: "{{ dest_cluster }}"
         path: "{{ dest_vserver + ':' + dest_volume }}"
+      source_hostname: "{{ netapp_hostname }}"
       <<: *login
+      hostname: "{{ dest_netapp_hostname }}"
