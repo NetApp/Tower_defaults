@@ -45,7 +45,7 @@
       name: "{{ volume_name }}_policy"
       vserver: "{{ vserver }}"
       <<: *login
-  - na_ontap_epxort_policy_rule:
+  - na_ontap_export_policy_rule:
       state: "{{ state }}"
       name: "{{ volume_name }}_policy"
       client_match: "{{ client_match }}"
